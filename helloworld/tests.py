@@ -1,6 +1,5 @@
 from django.test import TestCase
 import pytest
-from pytest_django.asserts import assertTemplateUsed
 
 class TestHelloWorld(TestCase):
     def test_render_page(self):

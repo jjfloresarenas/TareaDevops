@@ -1,0 +1,42 @@
+# .github/workflows/ci.yml
+name: CI
+
+permissions:
+  contents: read
+
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+    branches:
+      - staging    # Causes CI to run when Bors pushes to staging
+      - trying     # Causes CI to run when Bors pushes to trying (bors try)
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+      - name: Test with pytest
+        run: |
+          pytest
+
+  # This job should depend on all required jobs.
+  # We will make Bors watch this job to tell whether to merge or not.
+  done:
+    name: Done
+    needs: [build]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Done
+        run: echo Done
